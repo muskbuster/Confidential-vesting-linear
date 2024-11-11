@@ -2,7 +2,7 @@
 pragma solidity >=0.8.22;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-
+import "fhevm/lib/TFHE.sol";
 import { Lockup, LockupLinear } from "../types/DataTypes.sol";
 import { ISablierV2Lockup } from "./ISablierV2Lockup.sol";
 
@@ -76,7 +76,7 @@ interface ISablierV2LockupLinear is ISablierV2Lockup {
     ///
     /// @param params Struct encapsulating the function parameters, which are documented in {DataTypes}.
     /// @return streamId The ID of the newly created stream.
-    function createWithDurations(LockupLinear.CreateWithDurations calldata params)
+    function createWithDurations(LockupLinear.CreateWithDurations calldata params,euint64 deposit)
         external
         returns (uint256 streamId);
 
@@ -102,7 +102,7 @@ interface ISablierV2LockupLinear is ISablierV2Lockup {
     ///
     /// @param params Struct encapsulating the function parameters, which are documented in {DataTypes}.
     /// @return streamId The ID of the newly created stream.
-    function createWithTimestamps(LockupLinear.CreateWithTimestamps calldata params)
+    function createWithTimestamps(LockupLinear.CreateWithTimestamps calldata params, euint64 deposit)
         external
         returns (uint256 streamId);
 }

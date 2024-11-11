@@ -75,7 +75,7 @@ interface ISablierV2Lockup is
     /// @notice Retrieves the amount deposited in the stream, denoted in units of the asset's decimals.
     /// @dev Reverts if `streamId` references a null stream.
     /// @param streamId The stream ID for the query.
-    function getDepositedAmount(uint256 streamId) external view returns (euint64 depositedAmount);
+    function getDepositedAmount(uint256 streamId) external  returns (euint64 depositedAmount);
 
     /// @notice Retrieves the stream's end time, which is a Unix timestamp.
     /// @dev Reverts if `streamId` references a null stream.
@@ -91,7 +91,7 @@ interface ISablierV2Lockup is
     /// decimals. This amount is always zero unless the stream was canceled.
     /// @dev Reverts if `streamId` references a null stream.
     /// @param streamId The stream ID for the query.
-    function getRefundedAmount(uint256 streamId) external view returns (euint64 refundedAmount);
+    function getRefundedAmount(uint256 streamId) external  returns (euint64 refundedAmount);
 
     /// @notice Retrieves the stream's sender.
     /// @dev Reverts if `streamId` references a null stream.
@@ -106,7 +106,7 @@ interface ISablierV2Lockup is
     /// @notice Retrieves the amount withdrawn from the stream, denoted in units of the asset's decimals.
     /// @dev Reverts if `streamId` references a null stream.
     /// @param streamId The stream ID for the query.
-    function getWithdrawnAmount(uint256 streamId) external view returns (euint64 withdrawnAmount);
+    function getWithdrawnAmount(uint256 streamId) external  returns (euint64 withdrawnAmount);
 
     /// @notice Retrieves a flag indicating whether the provided address is a contract allowed to hook to Sablier
     /// when a stream is canceled or when assets are withdrawn.

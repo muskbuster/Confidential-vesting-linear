@@ -101,6 +101,7 @@ contract SablierV2LockupLinear is
             startTime: lockupStream.startTime,
             wasCanceled: lockupStream.wasCanceled
         });
+
     }
 
     /// @inheritdoc ISablierV2LockupLinear
@@ -121,10 +122,15 @@ contract SablierV2LockupLinear is
     /*//////////////////////////////////////////////////////////////////////////
                          USER-FACING NON-CONSTANT FUNCTIONS
     //////////////////////////////////////////////////////////////////////////*/
+function createWithDurations(LockupLinear.CreateWithDurations calldata params,einput deposit,bytes calldata inputproof)
+external {
+    euint64 depositAmount = TFHE.asEuint64(deposit, inputproof);
+    createWithDurations(params, depositAmount);
+}
 
     /// @inheritdoc ISablierV2LockupLinear
-    function createWithDurations(LockupLinear.CreateWithDurations calldata params)
-        external
+    function createWithDurations(LockupLinear.CreateWithDurations calldata params, euint64 deposit)
+        public
         override
         noDelegateCall
         returns (uint256 streamId)
@@ -148,7 +154,7 @@ contract SablierV2LockupLinear is
             LockupLinear.CreateWithTimestamps({
                 sender: params.sender,
                 recipient: params.recipient,
-                totalAmount: params.totalAmount,
+                totalAmount: deposit,
                 asset: params.asset,
                 cancelable: params.cancelable,
                 transferable: params.transferable,
@@ -156,16 +162,32 @@ contract SablierV2LockupLinear is
             })
         );
     }
+function createWithTimestamps(LockupLinear.CreateWithTimestamps calldata params,einput deposit,bytes calldata inputproof)
+external {
+    euint64 depositAmount = TFHE.asEuint64(deposit, inputproof);
+    createWithTimestamps(params, depositAmount);
+}
 
     /// @inheritdoc ISablierV2LockupLinear
-    function createWithTimestamps(LockupLinear.CreateWithTimestamps calldata params)
-        external
+    function createWithTimestamps(LockupLinear.CreateWithTimestamps calldata params,euint64 deposit)
+        public
         override
         noDelegateCall
         returns (uint256 streamId)
     {
         // Checks, Effects and Interactions: create the stream.
-        streamId = _create(params);
+        streamId = _create(
+            LockupLinear.CreateWithTimestamps({
+                sender: params.sender,
+                recipient: params.recipient,
+                totalAmount: deposit,
+                asset: params.asset,
+                cancelable: params.cancelable,
+                transferable: params.transferable,
+                timestamps: params.timestamps
+            })
+        );
+
     }
 
     /*//////////////////////////////////////////////////////////////////////////
@@ -212,9 +234,10 @@ contract SablierV2LockupLinear is
 
             // Cast the deposited amount to UD60x18.
             euint64 depositedAmount = _streams[streamId].amounts.deposited;
-
             // Calculate the streamed amount by multiplying the elapsed time percentage by the deposited amount.
             euint64 streamedAmount = TFHE.mul(depositedAmount,TFHE.asEuint64(elapsedTimePercentage));
+            TFHE.allow(streamedAmount,address(this));
+
 
             // Although the streamed amount should never exceed the deposited amount, this condition is checked
             // without asserting to avoid locking assets in case of a bug. If this situation occurs, the withdrawn
@@ -253,7 +276,10 @@ contract SablierV2LockupLinear is
             startTime: params.timestamps.start,
             wasCanceled: false
         });
-
+TFHE.allow(_streams[streamId].amounts.deposited,address(this));
+TFHE.allow(_streams[streamId].amounts.refunded,address(this));
+TFHE.allow(_streams[streamId].amounts.withdrawn,address(this));
+TFHE.allow(_streams[streamId].amounts.deposited,address(params.asset));
         // Effect: set the cliff time if it is greater than zero.
         if (params.timestamps.cliff > 0) {
             _cliffs[streamId] = params.timestamps.cliff;
@@ -269,7 +295,7 @@ contract SablierV2LockupLinear is
         _mint({ to: params.recipient, tokenId: streamId });
 
         // Interaction: transfer the deposit amount.
-        params.asset.transferFrom(msg.sender, address(this),createAmounts.deposit );
+        params.asset.transferFrom(msg.sender, address(this),createAmounts.deposit);
 
     }
 }

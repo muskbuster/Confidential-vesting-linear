@@ -81,12 +81,16 @@ abstract contract SablierV2Lockup is
     /// @inheritdoc ISablierV2Lockup
     function getDepositedAmount(uint256 streamId)
         external
-        view
         override
         notNull(streamId)
         returns (euint64 depositedAmount)
     {
         depositedAmount = _streams[streamId].amounts.deposited;
+        TFHE.allow(depositedAmount, address(this));
+      address sender= _streams[streamId].sender;
+      address  recipient=_ownerOf(streamId);
+        TFHE.allow(depositedAmount,sender);
+        TFHE.allow(depositedAmount,recipient);
     }
 
     /// @inheritdoc ISablierV2Lockup
@@ -103,12 +107,18 @@ abstract contract SablierV2Lockup is
     /// @inheritdoc ISablierV2Lockup
     function getRefundedAmount(uint256 streamId)
         external
-        view
+        
         override
         notNull(streamId)
         returns (euint64 refundedAmount)
     {
         refundedAmount = _streams[streamId].amounts.refunded;
+        TFHE.allow(refundedAmount, address(this));
+        address sender= _streams[streamId].sender;
+        address  recipient=_ownerOf(streamId);
+        TFHE.allow(refundedAmount,sender);
+        TFHE.allow(refundedAmount,recipient);
+
     }
 
     /// @inheritdoc ISablierV2Lockup
@@ -124,12 +134,16 @@ abstract contract SablierV2Lockup is
     /// @inheritdoc ISablierV2Lockup
     function getWithdrawnAmount(uint256 streamId)
         external
-        view
         override
         notNull(streamId)
         returns (euint64 withdrawnAmount)
     {
         withdrawnAmount = _streams[streamId].amounts.withdrawn;
+       address sender= _streams[streamId].sender;
+      address  recipient=_ownerOf(streamId);
+        TFHE.allow(withdrawnAmount,sender);
+        TFHE.allow(withdrawnAmount,recipient);
+        TFHE.allow(withdrawnAmount, address(this));
     }
 
     /// @inheritdoc ISablierV2Lockup
@@ -184,6 +198,11 @@ abstract contract SablierV2Lockup is
         if (_streams[streamId].isCancelable && !_streams[streamId].isDepleted) {
             refundableAmount = TFHE.sub(_streams[streamId].amounts.deposited , _calculateStreamedAmount(streamId));
         }
+        TFHE.allow(refundableAmount, address(this));
+        address sender= _streams[streamId].sender;
+        address  recipient=_ownerOf(streamId);
+        TFHE.allow(refundableAmount,sender);
+        TFHE.allow(refundableAmount,recipient);
         // Otherwise, the result is implicitly zero.
     }
 
@@ -200,6 +219,11 @@ abstract contract SablierV2Lockup is
         returns (euint64 streamedAmount)
     {
         streamedAmount = _streamedAmountOf(streamId);
+        TFHE.allow(streamedAmount, address(this));
+        address sender= _streams[streamId].sender;
+        address  recipient=_ownerOf(streamId);
+        TFHE.allow(streamedAmount,sender);
+        TFHE.allow(streamedAmount,recipient);
     }
 
     /// @inheritdoc ERC721
@@ -371,6 +395,8 @@ abstract contract SablierV2Lockup is
         euint64 withdrawableAmount = _withdrawableAmountOf(streamId);
         ebool withdrawable=TFHE.le(amount, withdrawableAmount);
         euint64 transferAmount=TFHE.select(withdrawable,amount,withdrawableAmount);
+        TFHE.allow(transferAmount, address(this));
+
         // Effects and Interactions: make the withdrawal.
         _withdraw(streamId, to, transferAmount);
 
@@ -492,7 +518,9 @@ abstract contract SablierV2Lockup is
         if (_streams[streamId].isDepleted) {
             return amounts.withdrawn;
         } else if (_streams[streamId].wasCanceled) {
-            return TFHE.sub(amounts.deposited,amounts.refunded);//amounts.deposited - amounts.refunded;
+            euint64 sub= TFHE.sub(_streams[streamId].amounts.deposited,_streams[streamId].amounts.refunded);
+            //amounts.deposited - amounts.refunded;
+            TFHE.allow(sub, address(this));
         }
 
         return _calculateStreamedAmount(streamId);
@@ -522,10 +550,9 @@ abstract contract SablierV2Lockup is
         }
 
         // Calculate the sender's amount.
-        euint64 senderAmount;
-        unchecked {
-            senderAmount = TFHE.sub(amounts.deposited,streamedAmount);
-        }
+   
+          euint64  senderAmount = TFHE.sub(_streams[streamId].amounts.deposited,streamedAmount);
+        
 
         // Calculate the recipient's amount.
         euint64 recipientAmount = TFHE.sub(streamedAmount,amounts.withdrawn);
@@ -539,10 +566,10 @@ abstract contract SablierV2Lockup is
         // Retrieve the sender and the recipient from storage.
         address sender = _streams[streamId].sender;
         address recipient = _ownerOf(streamId);
-
         // Retrieve the ERC-20 asset from storage.
         ConfidentialERC20 asset = _streams[streamId].asset;
-
+        TFHE.allow(senderAmount, address(this));
+        TFHE.allow(senderAmount, address(asset));
         // Interaction: refund the sender.
         asset.transfer(sender, senderAmount);
 
@@ -603,7 +630,9 @@ abstract contract SablierV2Lockup is
     function _withdraw(uint256 streamId, address to, euint64 amount) internal {
         // Effect: update the withdrawn amount.
         _streams[streamId].amounts.withdrawn = TFHE.add(_streams[streamId].amounts.withdrawn,amount);
-
+        TFHE.allow(_streams[streamId].amounts.withdrawn, address(this));
+        ebool Transferable = TFHE.le(_streams[streamId].amounts.withdrawn,TFHE.sub(_streams[streamId].amounts.deposited,_streams[streamId].amounts.refunded));
+        euint64 transferAmount=TFHE.select(Transferable,amount,TFHE.asEuint64(0));
         // Retrieve the amounts from storage.
        // Lockup.Amounts memory amounts = _streams[streamId].amounts;
 
@@ -621,8 +650,10 @@ abstract contract SablierV2Lockup is
 
         // Retrieve the ERC-20 asset from storage.
         ConfidentialERC20 asset = _streams[streamId].asset;
-
+        TFHE.allow(transferAmount, address(this));
+        
+        TFHE.allow(transferAmount, address(asset));
         // Interaction: perform the ERC-20 transfer.
-        asset.transfer(to,amount );
+        asset.transfer(to,transferAmount );
     }
 }
