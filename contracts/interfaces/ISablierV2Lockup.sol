@@ -5,7 +5,6 @@ import { IERC4906 } from "@openzeppelin/contracts/interfaces/IERC4906.sol";
 import { ConfidentialERC20 } from "contracts/ConfidentialERC20.sol";
 import { IERC721Metadata } from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import { UD60x18 } from "@prb/math/src/UD60x18.sol";
-
 import { Lockup } from "../types/DataTypes.sol";
 import { IAdminable } from "./IAdminable.sol";
 import { ISablierV2NFTDescriptor } from "./ISablierV2NFTDescriptor.sol";

@@ -4,7 +4,6 @@ pragma solidity >=0.8.22;
 import { ConfidentialERC20 } from "contracts/ConfidentialERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import { UD60x18, ud } from "@prb/math/src/UD60x18.sol";
 import { SablierV2Lockup } from "./abstracts/SablierV2Lockup.sol";
 import { SablierV2Lockup } from "./abstracts/SablierV2Lockup.sol";
 import { ISablierV2LockupLinear } from "./interfaces/ISablierV2LockupLinear.sol";
