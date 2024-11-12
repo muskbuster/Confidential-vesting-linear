@@ -118,6 +118,14 @@ library LockupLinear {
         Durations durations;
 
     }
+    struct CreateWithDurationsIp {
+        address sender;
+        address recipient;
+        ConfidentialERC20 asset;
+        bool cancelable;
+        bool transferable;
+        Durations durations;
+    }
 
     /// @notice Struct encapsulating the parameters of the {SablierV2LockupLinear.createWithTimestamps} function.
     /// @param sender The address distributing the assets, with the ability to cancel the stream. It doesn't have to be
@@ -130,12 +138,11 @@ library LockupLinear {
     /// @param transferable Indicates if the stream NFT is transferable.
     /// @param timestamps Struct encapsulating (i) the stream's start time, (ii) cliff time, and (iii) end time, all as
     /// Unix timestamps.
-    /// @param broker Struct encapsulating (i) the address of the broker assisting in creating the stream, and (ii) the
     /// percentage fee paid to the broker from `totalAmount`, denoted as a fixed-point number. Both can be set to zero.
     struct CreateWithTimestamps {
         address sender;
         address recipient;
-        euint64 totalAmount;
+        /*euint64 totalAmount;*/
         ConfidentialERC20 asset;
         bool cancelable;
         bool transferable;

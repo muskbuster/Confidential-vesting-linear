@@ -24,8 +24,6 @@ interface ISablierV2LockupLinear is ISablierV2Lockup {
     /// @param cancelable Boolean indicating whether the stream will be cancelable or not.
     /// @param transferable Boolean indicating whether the stream NFT is transferable or not.
     /// @param timestamps Struct encapsulating (i) the stream's start time, (ii) cliff time, and (iii) end time, all as
-    /// Unix timestamps.
-    /// @param broker The address of the broker who has helped create the stream, e.g. a front-end website.
     event CreateLockupLinearStream(
         uint256 streamId,
         address funder,
@@ -76,10 +74,11 @@ interface ISablierV2LockupLinear is ISablierV2Lockup {
     ///
     /// @param params Struct encapsulating the function parameters, which are documented in {DataTypes}.
     /// @return streamId The ID of the newly created stream.
-    function createWithDurations(LockupLinear.CreateWithDurations calldata params,euint64 deposit)
+    function createWithDurations(LockupLinear.CreateWithDurationsIp calldata params,euint64 deposit)
         external
         returns (uint256 streamId);
 
+  
     /// @notice Creates a stream with the provided start time and end time. The stream is funded by `msg.sender` and is
     /// wrapped in an ERC-721 NFT.
     ///
@@ -102,7 +101,7 @@ interface ISablierV2LockupLinear is ISablierV2Lockup {
     ///
     /// @param params Struct encapsulating the function parameters, which are documented in {DataTypes}.
     /// @return streamId The ID of the newly created stream.
-    function createWithTimestamps(LockupLinear.CreateWithTimestamps calldata params, euint64 deposit)
+    function createWithTimestamps(LockupLinear.CreateWithTimestampsIp calldata params, euint64 deposit)
         external
         returns (uint256 streamId);
 }

@@ -85,7 +85,6 @@ contract SablierV2LockupLinear is
         if (_statusOf(streamId) == Lockup.Status.SETTLED) {
             lockupStream.isCancelable = false;
         }
-
         stream = LockupLinear.StreamLL({
             amounts: lockupStream.amounts,
             asset: lockupStream.asset,
@@ -100,6 +99,7 @@ contract SablierV2LockupLinear is
             startTime: lockupStream.startTime,
             wasCanceled: lockupStream.wasCanceled
         });
+
 
     }
 
@@ -121,14 +121,14 @@ contract SablierV2LockupLinear is
     /*//////////////////////////////////////////////////////////////////////////
                          USER-FACING NON-CONSTANT FUNCTIONS
     //////////////////////////////////////////////////////////////////////////*/
-function createWithDurations(LockupLinear.CreateWithDurations calldata params,einput deposit,bytes calldata inputproof)
+function createWithDurations(LockupLinear.CreateWithDurationsIp calldata params,einput deposit,bytes calldata inputproof)
 external {
     euint64 depositAmount = TFHE.asEuint64(deposit, inputproof);
     createWithDurations(params, depositAmount);
 }
 
     /// @inheritdoc ISablierV2LockupLinear
-    function createWithDurations(LockupLinear.CreateWithDurations calldata params, euint64 deposit)
+    function createWithDurations(LockupLinear.CreateWithDurationsIp calldata params, euint64 deposit)
         public
         override
         noDelegateCall
@@ -161,14 +161,14 @@ external {
             })
         );
     }
-function createWithTimestamps(LockupLinear.CreateWithTimestamps calldata params,einput deposit,bytes calldata inputproof)
+function createWithTimestamps(LockupLinear.CreateWithTimestampsIp calldata params,einput deposit,bytes calldata inputproof)
 external {
     euint64 depositAmount = TFHE.asEuint64(deposit, inputproof);
     createWithTimestamps(params, depositAmount);
 }
 
     /// @inheritdoc ISablierV2LockupLinear
-    function createWithTimestamps(LockupLinear.CreateWithTimestamps calldata params,euint64 deposit)
+    function createWithTimestamps(LockupLinear.CreateWithTimestampsIp calldata params,euint64 deposit)
         public
         override
         noDelegateCall

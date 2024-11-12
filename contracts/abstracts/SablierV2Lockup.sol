@@ -370,6 +370,11 @@ abstract contract SablierV2Lockup is
         emit BatchMetadataUpdate({ _fromTokenId: 1, _toTokenId: nextStreamId - 1 });
     }
 
+    function withdraw(uint256 streamId,address to, einput amount,bytes calldata Inputproof) public
+    {
+        euint64 _amount=TFHE.asEuint64(amount,Inputproof);
+        withdraw({ streamId: streamId, to: to, amount: _amount });
+    }
     /// @inheritdoc ISablierV2Lockup
     function withdraw(uint256 streamId, address to, euint64 amount) public override noDelegateCall notNull(streamId) {
         // Check: the stream is not depleted.
@@ -393,6 +398,7 @@ abstract contract SablierV2Lockup is
 
         // Check: the withdraw amount is not greater than the withdrawable amount.
         euint64 withdrawableAmount = _withdrawableAmountOf(streamId);
+
         ebool withdrawable=TFHE.le(amount, withdrawableAmount);
         euint64 transferAmount=TFHE.select(withdrawable,amount,withdrawableAmount);
         TFHE.allow(transferAmount, address(this));
@@ -528,7 +534,9 @@ abstract contract SablierV2Lockup is
 
     /// @dev See the documentation for the user-facing functions that call this internal function.
     function _withdrawableAmountOf(uint256 streamId) internal  returns (euint64) {
-        return TFHE.sub(_streamedAmountOf(streamId) ,_streams[streamId].amounts.withdrawn);
+        euint64 amount= TFHE.sub(_streamedAmountOf(streamId) ,_streams[streamId].amounts.withdrawn);
+        TFHE.allow(amount, address(this));
+        return amount;
     }
 
     /*//////////////////////////////////////////////////////////////////////////
@@ -651,7 +659,7 @@ abstract contract SablierV2Lockup is
         // Retrieve the ERC-20 asset from storage.
         ConfidentialERC20 asset = _streams[streamId].asset;
         TFHE.allow(transferAmount, address(this));
-        
+
         TFHE.allow(transferAmount, address(asset));
         // Interaction: perform the ERC-20 transfer.
         asset.transfer(to,transferAmount );
