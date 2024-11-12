@@ -121,14 +121,15 @@ contract SablierV2LockupLinear is
     /*//////////////////////////////////////////////////////////////////////////
                          USER-FACING NON-CONSTANT FUNCTIONS
     //////////////////////////////////////////////////////////////////////////*/
-function createWithDurations(LockupLinear.CreateWithDurationsIp calldata params,einput deposit,bytes calldata inputproof)
+function createWithDurationsIP(address sender,address recipient,address asset,uint40 cliff,uint40 total, einput deposit,bytes calldata inputproof)
 external {
+
     euint64 depositAmount = TFHE.asEuint64(deposit, inputproof);
-    createWithDurations(params, depositAmount);
+    createWithDurations(sender,recipient,asset,cliff,total,depositAmount);
 }
 
     /// @inheritdoc ISablierV2LockupLinear
-    function createWithDurations(LockupLinear.CreateWithDurationsIp calldata params, euint64 deposit)
+    function createWithDurations(address sender,address recipient,address asset,uint40 cliff,uint40 total, euint64 deposit)
         public
         override
         noDelegateCall
@@ -142,21 +143,21 @@ external {
         // nonetheless check that the end time is greater than the cliff time, and also that the cliff time, if set,
         // is greater than or equal to the start time.
         unchecked {
-            if (params.durations.cliff > 0) {
-                timestamps.cliff = timestamps.start + params.durations.cliff;
+            if (cliff > 0) {
+                timestamps.cliff = timestamps.start + cliff;
             }
-            timestamps.end = timestamps.start + params.durations.total;
+            timestamps.end = timestamps.start + total;
         }
-
+        ConfidentialERC20 assetToken = ConfidentialERC20(asset);
         // Checks, Effects and Interactions: create the stream.
         streamId = _create(
             LockupLinear.CreateWithTimestamps({
-                sender: params.sender,
-                recipient: params.recipient,
+                sender: sender,
+                recipient: recipient,
                 totalAmount: deposit,
-                asset: params.asset,
-                cancelable: params.cancelable,
-                transferable: params.transferable,
+                asset:  assetToken,
+                cancelable: true,
+                transferable: true,
                 timestamps: timestamps
             })
         );
@@ -292,9 +293,10 @@ TFHE.allow(_streams[streamId].amounts.deposited,address(params.asset));
 
         // Effect: mint the NFT to the recipient.
         _mint({ to: params.recipient, tokenId: streamId });
-
+        TFHE.allow(createAmounts.deposit,address(params.asset));
         // Interaction: transfer the deposit amount.
         params.asset.transferFrom(msg.sender, address(this),createAmounts.deposit);
 
     }
+    
 }

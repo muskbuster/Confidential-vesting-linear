@@ -63,18 +63,8 @@ interface ISablierV2LockupLinear is ISablierV2Lockup {
                                NON-CONSTANT FUNCTIONS
     //////////////////////////////////////////////////////////////////////////*/
 
-    /// @notice Creates a stream by setting the start time to `block.timestamp`, and the end time to
-    /// the sum of `block.timestamp` and `params.durations.total`. The stream is funded by `msg.sender` and is wrapped
-    /// in an ERC-721 NFT.
-    ///
-    /// @dev Emits a {Transfer} and {CreateLockupLinearStream} event.
-    ///
-    /// Requirements:
-    /// - All requirements in {createWithTimestamps} must be met for the calculated parameters.
-    ///
-    /// @param params Struct encapsulating the function parameters, which are documented in {DataTypes}.
-    /// @return streamId The ID of the newly created stream.
-    function createWithDurations(LockupLinear.CreateWithDurationsIp calldata params,euint64 deposit)
+
+    function createWithDurations(address sender,address recipient,address asset,uint40 cliff,uint40 total,euint64 deposit)
         external
         returns (uint256 streamId);
 
