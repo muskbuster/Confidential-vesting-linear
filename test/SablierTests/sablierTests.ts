@@ -21,48 +21,48 @@ describe("Sablier tests", function () {
         this.instances = await createInstances(this.signers);
     });
 
-    // it("should deploy Sablier contract and createPlan", async function () {
-    //   //mint
-    //   const tx1 = await this.token.mint(100000);
-    //   await tx1.wait();
-    //     // Approval
-    //     const inputAlice = this.instances.alice.createEncryptedInput(this.tokenAddress, this.signers.alice.address);
-    //     inputAlice.add64(100000);
-    //     const encryptedAllowanceAmount = inputAlice.encrypt();
-    //     const tx = await this.token["approve(address,bytes32,bytes)"](
-    //       this.contractAddress,
-    //       encryptedAllowanceAmount.handles[0],
-    //       encryptedAllowanceAmount.inputProof,
-    //     );
-    //     await tx.wait();
-    //     console.log("Approval successful");
+    it("should deploy Sablier contract and createPlan with durations", async function () {
+      //mint
+      const tx1 = await this.token.mint(100000);
+      await tx1.wait();
+        // Approval
+        const inputAlice = this.instances.alice.createEncryptedInput(this.tokenAddress, this.signers.alice.address);
+        inputAlice.add64(100000);
+        const encryptedAllowanceAmount = inputAlice.encrypt();
+        const tx = await this.token["approve(address,bytes32,bytes)"](
+          this.contractAddress,
+          encryptedAllowanceAmount.handles[0],
+          encryptedAllowanceAmount.inputProof,
+        );
+        await tx.wait();
+        console.log("Approval successful");
 
-    //     const deposit = 1000; // Example deposit amount
-    //     const input = this.instances.alice.createEncryptedInput(this.contractAddress, this.signers.alice.address);
-    //     input.add64(deposit);
-    //     const encryptedDeposit = input.encrypt();
-    //     const createTrx= await this.contract["createWithDurationsIP(address,address,address,uint40,uint40,bytes32,bytes)"]
-    //       ( this.signers.alice.address, this.signers.bob.address,this.tokenAddress, 100, 1000, encryptedDeposit.handles[0], encryptedDeposit.inputProof);  
-    //     await createTrx.wait();
-    //     const balanceHandleAlice = await this.token.balanceOf(this.signers.alice);
-    //     const { publicKey: publicKeyAlice, privateKey: privateKeyAlice } = this.instances.alice.generateKeypair();
-    //     const eip712 = this.instances.alice.createEIP712(publicKeyAlice, this.tokenAddress);
-    //     const signatureAlice = await this.signers.alice.signTypedData(
-    //       eip712.domain,
-    //       { Reencrypt: eip712.types.Reencrypt },
-    //       eip712.message,
-    //     );
-    //     const balanceAlice = await this.instances.alice.reencrypt(
-    //       balanceHandleAlice,
-    //       privateKeyAlice,
-    //       publicKeyAlice,
-    //       signatureAlice.replace("0x", ""),
-    //       this.tokenAddress,
-    //       this.signers.alice.address,
-    //     );
+        const deposit = 1000; // Example deposit amount
+        const input = this.instances.alice.createEncryptedInput(this.contractAddress, this.signers.alice.address);
+        input.add64(deposit);
+        const encryptedDeposit = input.encrypt();
+        const createTrx= await this.contract["createWithDurationsIP(address,address,address,uint40,uint40,bytes32,bytes)"]
+          ( this.signers.alice.address, this.signers.bob.address,this.tokenAddress, 100, 1000, encryptedDeposit.handles[0], encryptedDeposit.inputProof);  
+        await createTrx.wait();
+        const balanceHandleAlice = await this.token.balanceOf(this.signers.alice);
+        const { publicKey: publicKeyAlice, privateKey: privateKeyAlice } = this.instances.alice.generateKeypair();
+        const eip712 = this.instances.alice.createEIP712(publicKeyAlice, this.tokenAddress);
+        const signatureAlice = await this.signers.alice.signTypedData(
+          eip712.domain,
+          { Reencrypt: eip712.types.Reencrypt },
+          eip712.message,
+        );
+        const balanceAlice = await this.instances.alice.reencrypt(
+          balanceHandleAlice,
+          privateKeyAlice,
+          publicKeyAlice,
+          signatureAlice.replace("0x", ""),
+          this.tokenAddress,
+          this.signers.alice.address,
+        );
     
-    //     expect(balanceAlice).to.equal(100000 - 1000);
-    // });
+        expect(balanceAlice).to.equal(100000 - 1000);
+    });
 
     it("should create a plan and allow withdrawals", async function () {
             //mint
