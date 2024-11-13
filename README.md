@@ -22,33 +22,26 @@ A Hardhat-based template for developing Solidity smart contracts, complete with 
 
 Click the [`Use this template`](https://github.com/Inco-fhevm/fhevm-hardhat-template-rivest/generate) button to create a new repository from this template.
 
-## Features
+## Confidential Vesting 
 
-This template integrates popular frameworks and libraries. For more details, refer to their respective documentation:
+This is a basic modification of Sablier's Linear-streaming-contract to enable creation of confidential streams between users.
+It uses Inco's FHE stack to encrypt and store ciphertexts. And this can be directly done via smart contracts using the TFHE library. 
 
-- [Hardhat Tutorial](https://hardhat.org/tutorial) and [Docs](https://hardhat.org/docs).
-- Check out the [Testing Contracts](https://hardhat.org/tutorial/testing-contracts) section in Hardhat’s tutorial.
 
-### Sensible Defaults
 
-Default configuration files included:
+Currently Enables
+- Hidden stream amounts 
+- Hidden token transfer using CERC20
+- Hidden creation Date 
 
-```text
-├── .editorconfig
-├── .gitignore
-├── .prettierignore
-├── .prettierrc.yml
-├── .solcover.js
-├── .solhint.json
-└── hardhat.config.ts
-```
+We can further encrypt addresses and the duration parameters.This  implementation is to demonstrate a more balanced approach for privacy with transparancy.
 
-### GitHub Actions
+Modified Contracts 
+- SablierV2Lockup.sol
+- Datatypes.sol
+- SablierV2LockupLinear.sol
 
-GitHub Actions are pre-configured for this template. Contracts are linted and tested on each push and pull request to the `main` branch.
-
-To enable CI, set `INFURA_API_KEY` and `MNEMONIC` as GitHub secrets. The CI script is located at [.github/workflows/ci.yml](./.github/workflows/ci.yml).
-
+Learn More about Inco and FHE [here](https://docs.inco.org)
 ## Usage
 
 ### Prerequisites
@@ -127,6 +120,8 @@ Clean up artifacts, coverage reports, and cache:
 ```sh
 pnpm clean
 ```
+
+
 
 ## Resources
 
