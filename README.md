@@ -27,6 +27,7 @@ Click the [`Use this template`](https://github.com/Inco-fhevm/fhevm-hardhat-temp
 This is a basic modification of Sablier's Linear-streaming-contract to enable creation of confidential streams between users.
 It uses Inco's FHE stack to encrypt and store ciphertexts. And this can be directly done via smart contracts using the TFHE library. 
 
+![image](https://github.com/user-attachments/assets/3b6cc29b-46e8-47fe-aa34-15f797449154)
 
 
 Currently Enables
